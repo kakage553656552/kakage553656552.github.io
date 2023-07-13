@@ -24,5 +24,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Set up Git
+        run: |
+          git config --global user.name "Kaka.zhang"
+          git config --global user.email "Kaka.zhang@mspbots.ai"
+
       - name: Deploy
         run: npx gh-pages -d dist
