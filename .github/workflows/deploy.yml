@@ -26,7 +26,7 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name "Kaka.zhang"
+          git config --global user.name "kakage553656552"
           git config --global user.email "553656552@qq.com"
 
       - name: Deploy
