@@ -1,14 +1,25 @@
 <template>
-  <div class="chat-container">
+  <div class="chat-container" :style="{ background: themeColor }">
+    <!-- 主题颜色选择器 -->
+    <div class="theme-picker">
+      <el-color-picker v-model="themeColor" @change="updateTheme" show-alpha></el-color-picker>
+    </div>
+
     <!-- 聊天记录区域 -->
     <div class="chat-history">
       <div v-for="(message, index) in messages" :key="index" class="message-container">
         <div :class="['message', message.role]">
-          <div class="avatar">
-            <i v-if="message.role === 'user'" class="el-icon-user"></i>
-            <i v-else class="el-icon-chat-dot-round"></i>
+          <!-- 用户消息：头像在右侧 -->
+          <div v-if="message.role === 'user'" class="content">{{ message.content }}</div>
+          <div v-if="message.role === 'user'" class="avatar">
+            <i class="el-icon-user"></i>
           </div>
-          <div class="content">{{ message.content }}</div>
+
+          <!-- AI 消息：头像在左侧 -->
+          <div v-if="message.role === 'assistant'" class="avatar">
+            <i class="el-icon-chat-dot-round"></i>
+          </div>
+          <div v-if="message.role === 'assistant'" class="content">{{ message.content }}</div>
         </div>
       </div>
       <div v-if="isLoading" class="loading-indicator">
@@ -45,9 +56,16 @@ export default {
       inputText: '', // 用户输入的内容
       messages: [], // 聊天记录
       isLoading: false, // 是否正在加载
+      themeColor: '#409EFF', // 默认主题颜色
     };
   },
   mounted() {
+    // 从 localStorage 加载保存的主题颜色
+    const savedColor = localStorage.getItem('themeColor');
+    if (savedColor) {
+      this.themeColor = savedColor;
+    }
+
     // 组件加载时发送问候语
     this.sendGreeting();
   },
@@ -131,6 +149,11 @@ export default {
         }
       }
     },
+    // 更新主题颜色
+    updateTheme(color) {
+      this.themeColor = color;
+      localStorage.setItem('themeColor', color); // 保存到 localStorage
+    },
   },
 };
 </script>
@@ -140,11 +163,18 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea, #764ba2);
   padding: 20px;
   box-sizing: border-box;
   max-width: 800px; // 限制整体宽度
   margin: 0 auto; // 居中显示
+  transition: background 0.3s ease; // 背景颜色过渡效果
+
+  .theme-picker {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
 
   .chat-history {
     flex: 1;
@@ -168,10 +198,11 @@ export default {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #409eff;
+          background: v-bind(themeColor); // 动态应用主题颜色
           border-radius: 50%;
           color: white;
-          margin-right: 10px;
+          margin-left: 10px; // 用户头像在右侧
+          margin-right: 0; // 取消右侧间距
           flex-shrink: 0;
         }
 
@@ -186,8 +217,9 @@ export default {
           justify-content: flex-end;
 
           .content {
-            background: #409eff;
+            background: v-bind(themeColor); // 动态应用主题颜色
             color: white;
+            margin-right: 10px; // 用户消息内容与头像的间距
           }
         }
 
@@ -195,6 +227,7 @@ export default {
           .content {
             background: #f0f0f0;
             color: #333;
+            margin-left: 10px; // AI 消息内容与头像的间距
           }
         }
       }
@@ -227,20 +260,20 @@ export default {
         transition: border-color 0.3s, box-shadow 0.3s;
 
         &:focus {
-          border-color: #409eff;
-          box-shadow: 0 0 8px rgba(64, 158, 255, 0.5);
+          border-color: v-bind(themeColor); // 动态应用主题颜色
+          box-shadow: 0 0 8px v-bind(themeColor); // 动态应用主题颜色
         }
       }
     }
 
     .send-button {
-      background: #409eff;
+      background: v-bind(themeColor); // 动态应用主题颜色
       color: white;
       border: none;
       transition: background 0.3s, transform 0.3s;
 
       &:hover {
-        background: #66b1ff;
+        background: v-bind(themeColor); // 保持主题颜色
         transform: scale(1.1);
       }
 
